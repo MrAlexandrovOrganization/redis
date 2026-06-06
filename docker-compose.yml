@@ -23,6 +23,12 @@ services:
         max-size: "10m"
         max-file: "3"
 
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+          cpus: "1.0"
+
   redisinsight:
     image: redis/redisinsight:3.2
     restart: unless-stopped
@@ -39,6 +45,12 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+          cpus: "0.5"
 
 volumes:
   redis_data:
