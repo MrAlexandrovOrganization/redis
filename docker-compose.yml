@@ -17,17 +17,9 @@ services:
       retries: 5
     networks:
       - redis-net
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-    deploy:
-      resources:
-        limits:
-          memory: 1g
-          cpus: "1.0"
+    extends:
+      file: docker-compose.base.yml
+      service: base
 
   redisinsight:
     image: redis/redisinsight:3.2
@@ -40,17 +32,15 @@ services:
       - redis
     networks:
       - redis-net
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+
+    extends:
+      file: docker-compose.base.yml
+      service: base
 
     deploy:
       resources:
         limits:
-          memory: 512m
-          cpus: "0.5"
+          memory: 256m
 
 volumes:
   redis_data:
