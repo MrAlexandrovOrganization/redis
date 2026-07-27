@@ -1,6 +1,8 @@
 networks:
   redis-net:
     name: redis-net
+    driver_opts:
+      com.docker.network.driver.mtu: "1376"
 
 services:
   redis:
