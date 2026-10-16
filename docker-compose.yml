@@ -6,7 +6,7 @@ networks:
 
 services:
   redis:
-    container_name: redis
+    container_name: "${CONTAINER_NAME_PREFIX:-}redis"
     hostname: redis
     image: redis:7-alpine
     restart: unless-stopped
@@ -24,6 +24,7 @@ services:
       service: base
 
   redisinsight:
+    container_name: "${CONTAINER_NAME_PREFIX:-}redisinsight"
     image: redis/redisinsight:3.2
     restart: unless-stopped
     ports:
