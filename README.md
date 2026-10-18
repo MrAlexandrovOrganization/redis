@@ -1,4 +1,4 @@
-# infra__redis
+# redis
 
 ## Структура Compose
 
