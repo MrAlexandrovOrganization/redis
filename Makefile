@@ -35,3 +35,7 @@ config-check:
 	$(DOCKER_COMPOSE) --env-file /dev/null config --quiet --no-env-resolution
 
 check: config-check
+
+.PHONY: ci-deploy
+ci-deploy:
+	python3 scripts/ci-deploy.py
