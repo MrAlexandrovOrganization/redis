@@ -1,25 +1,47 @@
 name: CI/CD
-
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
-
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
 jobs:
-  deploy:
-    name: Deploy to VM
+  validate:
     runs-on: ubuntu-24.04
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
     steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1
+      - uses: actions/checkout@v4
+      - run: make check
+  deploy:
+    needs: validate
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: appleboy/ssh-action@v1.2.2
+        env:
+          DEPLOY_SHA: ${{ github.sha }}
         with:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
+          fingerprint: ${{ secrets.VM_FINGERPRINT }}
+          proxy_host: ${{ secrets.VM_PROXY_HOST }}
+          proxy_username: ${{ secrets.VM_PROXY_USER }}
+          proxy_key: ${{ secrets.VM_PROXY_KEY }}
+          proxy_fingerprint: ${{ secrets.VM_PROXY_FINGERPRINT }}
+          envs: DEPLOY_SHA
           script: |
-            cd ${{ secrets.VM_PROJECT_PATH }}
-            git pull
-            make up
+            set -eu
+            cd /home/maxim/projects/infra/redis
+            test ! -e .retired
+            test "$(git rev-parse --show-toplevel)" = "$(pwd -P)"
+            test "$(git branch --show-current)" = main
+            test -z "$(git status --porcelain)"
+            git fetch --quiet origin refs/heads/main
+            test "$(git rev-parse FETCH_HEAD)" = "$DEPLOY_SHA"
+            git merge --ff-only "$DEPLOY_SHA"
+            sudo -n make deploy

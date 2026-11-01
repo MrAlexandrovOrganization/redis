@@ -8,7 +8,10 @@ services:
   redis:
     container_name: "${CONTAINER_NAME_PREFIX:-}redis"
     hostname: redis
-    image: redis:7-alpine
+    ports:
+      - "127.0.0.1:16379:6379"
+    command: ["redis-server", "--appendonly", "yes", "--appendfsync", "everysec"]
+    image: ${REDIS_IMAGE:?Run via make}
     restart: unless-stopped
     volumes:
       - redis_data:/data
@@ -24,8 +27,9 @@ services:
       service: base
 
   redisinsight:
+    profiles: [tools]
     container_name: "${CONTAINER_NAME_PREFIX:-}redisinsight"
-    image: redis/redisinsight:3.2
+    image: redis/redisinsight:${REDISINSIGHT_VERSION:?Run via make}
     restart: unless-stopped
     ports:
       - "127.0.0.1:5540:5540"
