@@ -39,3 +39,5 @@ check: config-check
 .PHONY: ci-deploy
 ci-deploy:
 	python3 scripts/ci-deploy.py
+
+include makefiles/observability.mk

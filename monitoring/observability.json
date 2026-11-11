@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "service": "redis",
+  "components": [
+    "redis/*"
+  ],
+  "logs": [
+    {
+      "file": "monitoring/alloy/logs.alloy",
+      "phase": "parse",
+      "order": 60
+    }
+  ],
+  "assets": []
+}
